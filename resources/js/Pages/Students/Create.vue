@@ -165,6 +165,7 @@ const submit = () => {
                                             <option
                                                 v-for="section in sections.data"
                                                 :value="section.id"
+                                                :key="section.id"
                                             >
                                                 {{ section.name }}
                                             </option>

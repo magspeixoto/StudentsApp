@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreStudentRequest;
+use App\Http\Resources\ClassesResource;
 use App\Http\Resources\StudentResource;
+use App\Models\Classes;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,30 +20,23 @@ class StudentController extends Controller
     }
 
     public function create() {
-        $students = StudentResource::collection(Student::paginate(5));
-        return Inertia::render('Students/Index', [
-            'students' => $students,
+        $classes = ClassesResource::collection(Classes::all());
+        return inertia::render('Students/Create', [
+            'classes' => $classes,
         ]);
     }
 
     public function edit() {
-        $students = StudentResource::collection(Student::paginate(5));
-        return Inertia::render('Students/Index', [
-            'students' => $students,
-        ]);
+        
     }
 
-    public function store() {
-        $students = StudentResource::collection(Student::paginate(5));
-        return Inertia::render('Students/Index', [
-            'students' => $students,
-        ]);
+    public function store(StoreStudentRequest $request) {
+        Student::create($request->validated());
+
+        return redirect()->route('students.index');
     }
 
     public function destroy() {
-        $students = StudentResource::collection(Student::paginate(5));
-        return Inertia::render('Students/Index', [
-            'students' => $students,
-        ]);
+        
     }
 }
