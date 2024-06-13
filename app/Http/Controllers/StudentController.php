@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreStudentRequest;
+use App\Http\Requests\UpdateStudentRequest;
 use App\Http\Resources\ClassesResource;
 use App\Http\Resources\StudentResource;
 use App\Models\Classes;
@@ -12,11 +13,26 @@ use Inertia\Inertia;
 
 class StudentController extends Controller
 {
-    public function index() {
-        $students = StudentResource::collection(Student::paginate(10));
+    public function index(Request $request) {
+        $studentsQuery = Student::query();
+
+        $this->applySearch($studentsQuery, $request->search);
+
+        $students = StudentResource::collection(
+            $studentsQuery->paginate(10)
+        );
+        
         return Inertia::render('Students/Index', [
             'students' => $students,
+            'search' => $request->search ?? '',
         ]);
+    }
+
+    protected function applySearch($query, $search){
+        return $query->when($search, function($query, $search){
+            $query->where('name','like','%'.$search.'%')
+            ->orWhere('email', 'like', '%'.$search.'%');
+        });
     }
 
     public function create() {
@@ -26,8 +42,12 @@ class StudentController extends Controller
         ]);
     }
 
-    public function edit() {
-        
+    public function edit(Student $student) {
+        $classes = ClassesResource::collection(Classes::all());
+        return inertia::render('Students/Edit', [
+            'classes' => $classes,
+            'student' => StudentResource::make($student),
+        ]);
     }
 
     public function store(StoreStudentRequest $request) {
@@ -36,7 +56,14 @@ class StudentController extends Controller
         return redirect()->route('students.index');
     }
 
-    public function destroy() {
-        
+    public function update(UpdateStudentRequest $request, Student $student) {
+        $student->update($request->validated());
+
+        return redirect()->route('students.index');
+    }
+    public function destroy(Student $student) {
+        $student->delete();
+
+        return redirect()->route('students.index');
     }
 }

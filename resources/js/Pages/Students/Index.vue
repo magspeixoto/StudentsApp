@@ -10,39 +10,24 @@ defineProps({
         type: Object,
     },
 });
+const page = usePage();
+let search = ref(page.props.search), pageNumber = ref(1);
 
-const updatePageNumber = (link)=> {
-    let pageNumber = link.url.split("=")[1];
-
-    router.visit("/students?page=" + pageNumber, {
-        preserveScroll: true,
-    });
-}
-
-
-let pageNumber = ref(1),
-    searchTerm = ref(usePage().props.search ?? "");
-
-const pageNumberUpdated = (link) => {
-    pageNumber.value = link.url.split("=")[1];
-};
+/* let pageNumber = ref(1),
+    search = ref(usePage().props.search ?? ""); */
 
 let studentsUrl = computed(() => {
-    const url = new URL(route("students.index"));
-
-    url.searchParams.set("page", pageNumber.value);
-
-    if (searchTerm.value) {
-        url.searchParams.set("search", searchTerm.value);
+    let url = new URL(route("students.index"));
+    url.searchParams.append("page", pageNumber.value);
+    if (search.value) {
+        url.searchParams.append("search", search.value);
     }
-
     return url;
 });
-
 watch(
     () => studentsUrl.value,
-    (newValue) => {
-        router.visit(newValue, {
+    (updatedStudentsUrl) => {
+        router.visit(updatedStudentsUrl, {
             replace: true,
             preserveState: true,
             preserveScroll: true,
@@ -103,7 +88,7 @@ const deleteStudent = (id) => {
 
                             <input
                                 type="text"
-                                v-model="searchTerm"
+                                v-model="search"
                                 placeholder="Search students data..."
                                 id="search"
                                 class="block rounded-lg border-0 py-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
