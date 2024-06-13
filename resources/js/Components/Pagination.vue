@@ -34,7 +34,7 @@
                         >
                         
                             <button
-                            @click.prevent="updatePageNumber(link)" :key="index"
+                            @click.prevent="updatedPageNumber(link)" :key="index"
                             v-for="(link, index) in data.meta.links" :disabled="link.active || !link.url"
                                 class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
                                 :class="{
@@ -60,7 +60,7 @@ defineProps({
     data: {
         type: Object,
     },
-    pageNumberUpdated: {
+    updatedPageNumber: {
         type: Function,
         required: true,
     },
